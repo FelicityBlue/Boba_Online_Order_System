@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/boba-order-online-system/boba-order-online-system.sln
+/boba-order-online-system/boba-order-online-system.vcxproj
+/boba-order-online-system/boba-order-online-system.vcxproj.filters
