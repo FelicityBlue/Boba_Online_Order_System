@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <vector>
 #include "items.cpp"
 
 Item item;
@@ -15,7 +16,8 @@ struct Drink {
     std::string size; // 1 - medium, 2 - large/hot
     double cost = 0;
 };
-
+// Get a drink order from the user
+Drink* getOrder(Drink*);
 // check if a user's input is a number
 int valid_num_input(int);
 // check if input is in range
@@ -31,13 +33,63 @@ void receipt(Drink*);
 
 int main()
 {
- 
-    Drink* order = new Drink;
+
+    std::vector<Drink*> drinks;
+    float total_cost = 0;
+    int total_drink = 1;
+    bool finish_order = false;
+
+    do {
+        std::cout << "\n Drink " << total_drink << ": ";
+        Drink* order = new Drink;
+        drinks.push_back(getOrder(order));
+        total_drink++;
+        total_cost += order->cost;
+        char more = ' ';
+
+        while (more != 'y' && more != 'n') {
+            std::cout << "\n Do you want to order more drink (y/n): ";
+            std::cin >> more;
+            if (more == 'n') {
+                finish_order = true;
+            }
+            else if (more == 'y') {
+                system("cls");
+            }
+            else {
+                std::cout << "\n Enter a valid answer";
+            }
+        }
+    
+    } while (!finish_order);
+    
+    // Display receipt
+     system("cls");
+
+     std::cout << "\n       RECEIPT\n";
+     for (int i = 0; i < drinks.size(); i++) {
+         // displaying object data
+         receipt(drinks[i]);
+     }
+     std::cout << "\n Total Drinks: " << total_drink;
+     printf("\n Total Cost: $%.2f\n", total_cost);
+
+    std::cout << "\n\n Thank you so much for choosing us!!\n\n";
+
+    // memory deallocation
+    for (int i = 0; i < drinks.size(); i++) {
+        delete(drinks[i]);
+    }
+    
+    return 0;
+}
+
+Drink* getOrder(Drink* order) {
 
     // Ask user's choice for drink category
     int category_i = -1;
     std::cout << "\n    Categories\n 1.Classic\n 2.Milk Tea\n 3.Punch\n 4.Yogurt\n 5.Slush\n 6.What's New\n Enter index of the category: ";
-    while (category_i < 1 || category_i > 6 ) { 
+    while (category_i < 1 || category_i > 6) {
         std::cin >> category_i;
         category_i = valid_num_input(category_i);
         in_range(category_i, 1, 6);
@@ -58,26 +110,28 @@ int main()
     }
 
     // Ask user's choice of number of topping
-    int n_topping =  -1;
-    std::cout << "\nHow many topping do you want (max is 3): ";
+    int n_topping = -1;
+    std::cout << "\n How many topping do you want (max is 3): ";
     while (n_topping < 0 || n_topping > 3) {
         std::cin >> n_topping;
         n_topping = valid_num_input(n_topping);
         in_range(n_topping, 0, 3);
     }
-    
+
     // Ask user's choice for toppings
-    int topping_i = -1 ;
+    int topping_i = -1;
     for (int ii = 0; ii < n_topping; ii++) {
         topping_i = 0;
-        std::cout << "\n 1.Bubbles\n 2.Pudding\n 3.Nata jellies\n 4.Mango popping bubbles\n 5.Lychee crystal bubbles\n Enter index of the topping " 
-            << ii+1 << ": ";
+        std::cout << "\n 1.Bubbles\n 2.Pudding\n 3.Nata jellies\n 4.Mango popping bubbles\n 5.Lychee crystal bubbles\n Enter index of the topping "
+            << ii + 1 << ": ";
         while (topping_i < 1 || topping_i > 6) {
-            std::cin >>topping_i;
+            std::cin >> topping_i;
             topping_i = valid_num_input(topping_i);
             in_range(topping_i, 1, 6);
         }
         order->topping[ii] = item.get_topping(topping_i);
+
+        
     }
 
     // Update values
@@ -90,15 +144,10 @@ int main()
     if (size_i == 2) {
         order->cost += 0.50;
     }
-     order->size = item.get_drink_size(size_i);
-    
-    // Display receipt
-    // works on most unix machines
-    std::cout << "\033[2J\033[1;1H"; // escape sequence to clear the console screen
-    receipt(order);
+    order->size = item.get_drink_size(size_i);
 
-    std::cout << "\n\n Thank you so much for choosing us!!\n\n";
-    return 0;
+    return order;
+
 }
 void in_range(int i, int low, int high) {
     if (i < low || i > high) {
@@ -229,5 +278,5 @@ void receipt(Drink* d) {
             std::cout << d->topping[ii];
         }
     }
-    printf("\n Total: $%.2f\n", d->cost);
+    printf("\n  ~Cost: $%.2f\n", d->cost);
 }
